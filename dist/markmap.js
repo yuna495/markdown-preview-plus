@@ -38128,12 +38128,15 @@ ${end2.comment}` : end2.comment;
       const { root: root3 } = transformer.transform(markdown);
       const container = document.createElement("div");
       container.style.position = "relative";
-      container.style.width = "100vw";
-      container.style.maxWidth = "100vw";
+      container.style.width = "85vw";
+      container.style.maxWidth = "85vw";
       container.style.marginLeft = "50%";
       container.style.transform = "translateX(-50%)";
       container.style.height = "auto";
       container.style.minHeight = "150px";
+      container.style.border = "1px solid #666";
+      container.style.boxSizing = "border-box";
+      container.style.borderRadius = "4px";
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.style.width = "100%";
       const style = document.createElement("style");
@@ -38187,10 +38190,14 @@ ${end2.comment}` : end2.comment;
       (async () => {
         await mm.fit();
         const { y2 } = mm.state.rect;
-        const height = y2 * 2 + 200;
-        if (height > 0) {
-          svg.style.height = `${height}px`;
-          container.style.height = `${height}px`;
+        let calculatedHeight = y2 * 1.5 + 300;
+        const MAX_HEIGHT = 800;
+        if (calculatedHeight > MAX_HEIGHT) {
+          calculatedHeight = MAX_HEIGHT;
+        }
+        if (calculatedHeight > 0) {
+          svg.style.height = `${calculatedHeight}px`;
+          container.style.height = `${calculatedHeight}px`;
         }
         await mm.fit();
       })();

@@ -89,13 +89,18 @@ function renderMarkmaps() {
     const container = document.createElement('div');
     // 固定の高さは削除し、コンテンツに合わせて広がるようにする
     container.style.position = 'relative';
-    container.style.width = '100vw';
-    container.style.maxWidth = '100vw';
+    // 左右幅の設定
+    container.style.width = '85vw';
+    container.style.maxWidth = '85vw';
     container.style.marginLeft = '50%';
     container.style.transform = 'translateX(-50%)';
     // 初期高さは最小限に
     container.style.height = 'auto';
     container.style.minHeight = '150px';
+    // 枠線を追加
+    container.style.border = '1px solid #666';
+    container.style.boxSizing = 'border-box';
+    container.style.borderRadius = '4px';
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.style.width = '100%';
@@ -147,7 +152,7 @@ function renderMarkmaps() {
     Toolbar.create(mm, toolbar);
 
     const resetButton = document.createElement('button');
-    resetButton.textContent = 'Reset Zoom';
+    resetButton.textContent = 'Reset';
     resetButton.type = 'button';
     resetButton.style.zIndex = '999';
     resetButton.style.cursor = 'pointer';
@@ -164,12 +169,21 @@ function renderMarkmaps() {
 
         // mm.state.rect から描画領域の高さを取得する
         const { y2 } = mm.state.rect;
-        // 縦幅が小さい場合でも十分な余白を確保するため固定値を加算
-        const height = y2 * 1.5 + 300;
 
-        if (height > 0) {
-            svg.style.height = `${height}px`;
-            container.style.height = `${height}px`; // コンテナも合わせる
+        // 縦幅の計算
+        let calculatedHeight = y2 * 1.5 + 300;
+
+        // ★重要: 上限値を設定 (例: 800px)
+        const MAX_HEIGHT = 800;
+
+        // 上限を超えないように制限する
+        if (calculatedHeight > MAX_HEIGHT) {
+            calculatedHeight = MAX_HEIGHT;
+        }
+
+        if (calculatedHeight > 0) {
+            svg.style.height = `${calculatedHeight}px`;
+            container.style.height = `${calculatedHeight}px`; // コンテナも合わせる
         }
 
         // 高さ変更後に再調整
