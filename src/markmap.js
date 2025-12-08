@@ -88,10 +88,7 @@ function renderMarkmaps() {
 
     const container = document.createElement('div');
     container.style.position = 'relative';
-    container.style.width = '85vw';
-    container.style.maxWidth = '85vw';
-    container.style.marginLeft = '50%';
-    container.style.transform = 'translateX(-50%)';
+    container.style.width = '100%';
     container.style.height = 'auto';
     container.style.minHeight = '150px';
     container.style.border = '1px solid #666';
@@ -100,6 +97,7 @@ function renderMarkmaps() {
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.style.width = '100%';
+    svg.style.display = 'block';
 
     const style = document.createElement('style');
     style.textContent = `

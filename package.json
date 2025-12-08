@@ -13,13 +13,11 @@
     "onLanguage:markdown"
   ],
   "main": "./src/extension.js",
-
   "contributes": {
-    "commands": [
-
-    ],
+    "commands": [],
     "markdown.previewScripts": [
-      "./dist/markmap.js"
+      "./dist/markmap.js",
+      "./dist/mermaid.js"
     ],
     "markdown.previewStyles": [
       "./node_modules/markmap-toolbar/dist/style.css"
@@ -31,7 +29,8 @@
     "lint": "eslint .",
     "pretest": "npm run lint",
     "test": "vscode-test",
-    "build:script": "npx esbuild ./src/markmap.js --bundle --outfile=dist/markmap.js --format=iife --platform=browser"
+    "build:script": "npx esbuild ./src/markmap.js --bundle --outfile=dist/markmap.js --format=iife --platform=browser",
+    "build:mermaid": "npx esbuild ./src/mermaid.js --bundle --outfile=dist/mermaid.js --format=iife --platform=browser"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.6",
@@ -49,9 +48,11 @@
   "dependencies": {
     "d3-scale": "^4.0.2",
     "d3-selection": "^3.0.0",
+    "d3-zoom": "^3.0.0",
     "markmap-lib": "^0.18.12",
     "markmap-toolbar": "^0.18.12",
-    "markmap-view": "^0.18.12"
+    "markmap-view": "^0.18.12",
+    "mermaid": "^11.12.2"
   },
   "license": "MIT"
 }
