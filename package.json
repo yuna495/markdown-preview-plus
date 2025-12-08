@@ -16,6 +16,11 @@
   "contributes": {
     "markdown.previewScripts": [
       "./dist/markmap.js"
+    ],
+    "markdown.markdownItPlugins": [
+      {
+        "module": "./src/markmap-it-plugin"
+      }
     ]
   },
   "icon": "./image/icon.png",
