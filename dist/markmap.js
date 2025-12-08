@@ -38103,14 +38103,14 @@ ${end2.comment}` : end2.comment;
       }
       if (trimmed.startsWith("- ") || trimmed.startsWith("* ") || trimmed.startsWith(">") || /^\d+\. /.test(trimmed)) {
         newLines.push(line);
-        lastHeaderIndex = -1;
+        lastHeaderIndex = newLines.length - 1;
         continue;
       }
       if (lastHeaderIndex !== -1) {
         const currentHeader = newLines[lastHeaderIndex];
-        newLines[lastHeaderIndex] = `${currentHeader}<br/><span class="markmap-body-text" style="font-weight:normal; font-size:0.9em; color:#ddd;">${trimmed}</span>`;
+        newLines[lastHeaderIndex] = `${currentHeader}<br/><span class="markmap-body-text">${trimmed}</span>`;
       } else {
-        newLines.push(`- <span class="markmap-body-text" style="font-weight:normal; font-size:0.9em; color:#ddd;">${trimmed}</span>`);
+        newLines.push(`- <span class="markmap-body-text">${trimmed}</span>`);
       }
     }
     return newLines.join("\n");
@@ -38127,7 +38127,7 @@ ${end2.comment}` : end2.comment;
       const markdown = processMarkdown(rawMarkdown);
       const { root: root3 } = transformer.transform(markdown);
       const container = document.createElement("div");
-      container.style.height = "400px";
+      container.style.height = "1000px";
       container.style.position = "relative";
       container.style.width = "100vw";
       container.style.maxWidth = "100vw";
@@ -38137,26 +38137,43 @@ ${end2.comment}` : end2.comment;
       svg.style.width = "100%";
       const style = document.createElement("style");
       style.textContent = `
-      .markmap-node text {
+      .markmap-node {
+        color: #ffffff !important;
         fill: #ffffff !important;
       }
+      .markmap-node text {
+        fill: #11ff84 !important;
+      }
+      .markmap-node foreignObject {
+        color: #ffffff !important;
+      }
       .markmap-body-text {
-        fill: #cccccc !important;
+        font-weight: normal;
+        font-size: 0.9em;
+        color: #cccccc !important;
+        display: inline-block; /* \u884C\u9001\u308A\u306A\u3069\u306B\u5F71\u97FF\u3057\u306A\u3044\u3088\u3046\u306B */
+      }
+      /* \u30EA\u30F3\u30AF\u306A\u3069\u306E\u8272\u3082\u898B\u3084\u3059\u304F */
+      .markmap-node a {
+        color: #8cb4ff !important;
       }
     `;
       svg.append(style);
       const toolbar = document.createElement("div");
       toolbar.style.position = "absolute";
       toolbar.style.right = "20px";
-      toolbar.style.bottom = "20px";
       toolbar.style.top = "20px";
-      toolbar.style.bottom = "auto";
       toolbar.style.padding = "0";
       toolbar.style.display = "flex";
       toolbar.style.gap = "8px";
       container.append(svg, toolbar);
       preElement.replaceWith(container);
-      const mm = it.create(svg, void 0, root3);
+      const mm = it.create(svg, {
+        spacingVertical: 35,
+        // 縦幅をかなり広げる
+        paddingX: 20
+        // 横のパディングも少し調整
+      }, root3);
       Toolbar.create(mm, toolbar);
       const resetButton = document.createElement("button");
       resetButton.textContent = "Reset Zoom";
@@ -38173,7 +38190,7 @@ ${end2.comment}` : end2.comment;
         if (gElement) {
           const bbox = gElement.getBBox();
           if (bbox && bbox.height) {
-            const newHeight = bbox.height + 60;
+            const newHeight = bbox.height + 100;
             if (newHeight > 400) {
               container.style.height = `${newHeight}px`;
               await mm.fit();

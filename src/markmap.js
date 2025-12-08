@@ -8,7 +8,7 @@ import { Toolbar } from 'markmap-toolbar';
 const transformer = new Transformer();
 
 /**
- * Markdownの本文（パラグラフ）を見出しに結合して "Heading: Body" の形式にする
+ * Markdownの本文（パラグラフ）を見出しやリストアイテムに結合して "Heading: Body" の形式にする
  */
 function processMarkdown(markdown) {
   const lines = markdown.split('\n');
@@ -23,7 +23,6 @@ function processMarkdown(markdown) {
     // コードブロックの判定
     if (trimmed.startsWith('```')) {
       inCodeBlock = !inCodeBlock;
-      // コードブロックは見出しには結合せず、そのまま出す
       newLines.push(line);
       lastHeaderIndex = -1;
       continue;
@@ -47,21 +46,22 @@ function processMarkdown(markdown) {
       continue;
     }
 
-    // リストアイテム、引用などは独立させる
+    // リストアイテムの場合も結合対象（親）とする
     if (trimmed.startsWith('- ') || trimmed.startsWith('* ') || trimmed.startsWith('>') || /^\d+\. /.test(trimmed)) {
       newLines.push(line);
-      lastHeaderIndex = -1;
+      lastHeaderIndex = newLines.length - 1;
       continue;
     }
 
     // それ以外（本文パラグラフ）
     if (lastHeaderIndex !== -1) {
-      // 直前の見出しに結合する
+      // 直前の見出し/リストに結合する
       const currentHeader = newLines[lastHeaderIndex];
-      newLines[lastHeaderIndex] = `${currentHeader}<br/><span class="markmap-body-text" style="font-weight:normal; font-size:0.9em; color:#ddd;">${trimmed}</span>`;
+      // <br/>で改行し、spanでスタイル適用
+      newLines[lastHeaderIndex] = `${currentHeader}<br/><span class="markmap-body-text">${trimmed}</span>`;
     } else {
-      // 見出しがない状態での本文
-      newLines.push(`- <span class="markmap-body-text" style="font-weight:normal; font-size:0.9em; color:#ddd;">${trimmed}</span>`);
+      // 親がない状態での本文
+      newLines.push(`- <span class="markmap-body-text">${trimmed}</span>`);
     }
   }
 
@@ -82,63 +82,68 @@ function renderMarkmaps() {
     preElement.dataset.markmapRendered = 'true';
 
     const rawMarkdown = el.textContent;
-    // 本文を表示できるように加工
     const markdown = processMarkdown(rawMarkdown);
 
-    // インポートした Transformer を直接使用
     const { root } = transformer.transform(markdown);
 
-    // コンテナの準備
     const container = document.createElement('div');
-    // 高さを指定。プレビューでスクロールできるように大きめに設定
-    container.style.height = '400px';
-    container.style.position = 'relative'; // ツールバーの位置調整のために追加
-
-    // 描画幅を広げる（全幅にする）
+    container.style.height = '1000px';
+    container.style.position = 'relative';
     container.style.width = '100vw';
     container.style.maxWidth = '100vw';
     container.style.marginLeft = '50%';
     container.style.transform = 'translateX(-50%)';
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.style.width = '100%'; // SVGも全幅に
+    svg.style.width = '100%';
 
     // SVG内のテキスト色を明るくするスタイルを追加
+    // MarkmapはHTMLを埋め込むのにforeignObjectを使うことがあるため、
+    // divやspanなどのHTML要素に対してもcolorを指定する。
     const style = document.createElement('style');
     style.textContent = `
-      .markmap-node text {
+      .markmap-node {
+        color: #ffffff !important;
         fill: #ffffff !important;
       }
+      .markmap-node text {
+        fill: #11ff84 !important;
+      }
+      .markmap-node foreignObject {
+        color: #ffffff !important;
+      }
       .markmap-body-text {
-        fill: #cccccc !important;
+        font-weight: normal;
+        font-size: 0.9em;
+        color: #cccccc !important;
+        display: inline-block; /* 行送りなどに影響しないように */
+      }
+      /* リンクなどの色も見やすく */
+      .markmap-node a {
+        color: #8cb4ff !important;
       }
     `;
     svg.append(style);
 
     const toolbar = document.createElement('div');
-    // ツールバーの位置調整
     toolbar.style.position = 'absolute';
-    toolbar.style.right = '20px'; // 画面端から少し余裕を持たせる
-    toolbar.style.bottom = '20px'; // 下部に配置変更（お好みで。上だと既存ツールバーと被るかも？）
+    toolbar.style.right = '20px';
     toolbar.style.top = '20px';
-    toolbar.style.bottom = 'auto';
     toolbar.style.padding = '0';
     toolbar.style.display = 'flex';
-    toolbar.style.gap = '8px'; // ボタン間の隙間
+    toolbar.style.gap = '8px';
 
     container.append(svg, toolbar);
-
-    // 元の<pre>要素をコンテナで置き換え
     preElement.replaceWith(container);
 
     // Markmapを描画
-    // インポートした Markmap を直接使用
-    const mm = Markmap.create(svg, undefined, root);
+    const mm = Markmap.create(svg, {
+      spacingVertical: 35, // 縦幅をかなり広げる
+      paddingX: 20, // 横のパディングも少し調整
+    }, root);
 
-    // ツールバーを有効化
     Toolbar.create(mm, toolbar);
 
-    // リセットボタンを追加
     const resetButton = document.createElement('button');
     resetButton.textContent = 'Reset Zoom';
     resetButton.type = 'button';
@@ -152,14 +157,11 @@ function renderMarkmaps() {
     // 初回レンダリング後に高さを調整 (BBox使用)
     requestAnimationFrame(async () => {
         await mm.fit();
-        // 描画完了を少し待つ必要があるかも
-        // mm.g は d3 selection
         const gElement = mm.g.node();
         if (gElement) {
             const bbox = gElement.getBBox();
             if (bbox && bbox.height) {
-                // 上下の余白 + ツールバー分
-                const newHeight = bbox.height + 60;
+                const newHeight = bbox.height + 100; // 余白を多めに
                 if (newHeight > 400) {
                      container.style.height = `${newHeight}px`;
                      await mm.fit();
