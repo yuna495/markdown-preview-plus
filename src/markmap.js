@@ -87,26 +87,20 @@ function renderMarkmaps() {
     const { root } = transformer.transform(markdown);
 
     const container = document.createElement('div');
-    // 固定の高さは削除し、コンテンツに合わせて広がるようにする
     container.style.position = 'relative';
-    // 左右幅の設定
     container.style.width = '85vw';
     container.style.maxWidth = '85vw';
     container.style.marginLeft = '50%';
     container.style.transform = 'translateX(-50%)';
-    // 初期高さは最小限に
     container.style.height = 'auto';
     container.style.minHeight = '150px';
-    // 枠線を追加
     container.style.border = '1px solid #666';
     container.style.boxSizing = 'border-box';
     container.style.borderRadius = '4px';
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.style.width = '100%';
-    // 高さも初期はautoだが、JSで制御する
 
-    // SVG内のテキスト色を明るくするスタイルを追加
     const style = document.createElement('style');
     style.textContent = `
       .markmap-node {
@@ -143,17 +137,14 @@ function renderMarkmaps() {
     container.append(svg, toolbar);
     preElement.replaceWith(container);
 
-    // Markmapを描画
     const mm = Markmap.create(svg, {
-      spacingVertical: 10, // 縦幅を広げる
+      spacingVertical: 15,
       paddingX: 20,
-      maxWidth: 300, // 自動折り返し幅
+      maxWidth: 300,
     }, root);
 
     Toolbar.create(mm, toolbar);
 
-    // レイアウト更新ロジックを関数化
-    // mmが定義された後に作成する必要がある
     const updateLayout = async () => {
         await mm.fit();
         const { y2 } = mm.state.rect;
@@ -183,8 +174,8 @@ function renderMarkmaps() {
     refreshButton.style.height = '30px';
     refreshButton.style.borderRadius = '50%'; // 丸くする
     refreshButton.style.border = '1px solid #ccc';
-    refreshButton.style.background = '#fff';
-    refreshButton.style.color = '#333';
+    refreshButton.style.background = '#222';
+    refreshButton.style.color = '#fff';
     refreshButton.style.fontSize = '16px';
     refreshButton.style.display = 'flex';
     refreshButton.style.alignItems = 'center';
@@ -205,13 +196,12 @@ function renderMarkmaps() {
         toolbar.appendChild(refreshButton);
     }
 
-    // 描画エリア内でのクリック・ドラッグイベントがVS Code側に伝わらないようにする
     const blockEvents = [
         'click', 'dblclick',
         'mousedown', 'mouseup', 'mousemove',
         'wheel',
         'pointerdown', 'pointerup', 'pointermove',
-        'contextmenu' // 右クリックメニューも防ぐ
+        'contextmenu'
     ];
     blockEvents.forEach(evt => {
         container.addEventListener(evt, (e) => {
@@ -219,15 +209,13 @@ function renderMarkmaps() {
         });
     });
 
-    // 初期レイアウト更新
-    // mm.fit() だけでなく updateLayout() を呼ぶことで高さ計算も行う
     (async () => {
-        // setDataは不要（createで渡しているため）だが、念のためrender完了を待つ意味でfitを呼ぶ
         await mm.fit();
         await updateLayout();
     })();
   });
 }
+
 // 初期レンダリング
 renderMarkmaps();
 

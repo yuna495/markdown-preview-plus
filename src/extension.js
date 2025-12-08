@@ -9,6 +9,8 @@ const markmapPlugin = require('./markmap-it-plugin');
  */
 function activate(context) {
 	console.log('Markdown Preview Plus is now active!');
+
+
 }
 
 // この関数をエクスポートすることで、VS CodeのMarkdown拡張機能が

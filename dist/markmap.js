@@ -38173,11 +38173,9 @@ ${end2.comment}` : end2.comment;
       container.append(svg, toolbar);
       preElement.replaceWith(container);
       const mm = it.create(svg, {
-        spacingVertical: 10,
-        // 縦幅を広げる
+        spacingVertical: 15,
         paddingX: 20,
         maxWidth: 300
-        // 自動折り返し幅
       }, root3);
       Toolbar.create(mm, toolbar);
       const updateLayout = async () => {
@@ -38204,8 +38202,8 @@ ${end2.comment}` : end2.comment;
       refreshButton.style.height = "30px";
       refreshButton.style.borderRadius = "50%";
       refreshButton.style.border = "1px solid #ccc";
-      refreshButton.style.background = "#fff";
-      refreshButton.style.color = "#333";
+      refreshButton.style.background = "#222";
+      refreshButton.style.color = "#fff";
       refreshButton.style.fontSize = "16px";
       refreshButton.style.display = "flex";
       refreshButton.style.alignItems = "center";
@@ -38232,7 +38230,6 @@ ${end2.comment}` : end2.comment;
         "pointerup",
         "pointermove",
         "contextmenu"
-        // 右クリックメニューも防ぐ
       ];
       blockEvents.forEach((evt) => {
         container.addEventListener(evt, (e) => {

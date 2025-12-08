@@ -13,7 +13,11 @@
     "onLanguage:markdown"
   ],
   "main": "./src/extension.js",
+
   "contributes": {
+    "commands": [
+
+    ],
     "markdown.previewScripts": [
       "./dist/markmap.js"
     ],
