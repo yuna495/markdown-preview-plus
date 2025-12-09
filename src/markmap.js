@@ -3,7 +3,9 @@
 import { Transformer } from 'markmap-lib';
 import { Markmap } from 'markmap-view';
 import { Toolbar } from 'markmap-toolbar';
-import { createToolbar, createToolbarButton } from './utils.js';
+import { createToolbar, createToolbarButton, applyContainerStyles, preventEventPropagation } from './utils.js';
+
+
 
 // Transformerのインスタンスを1つ作成し、再利用
 const transformer = new Transformer();
@@ -90,13 +92,15 @@ function renderMarkmaps() {
 
     const container = document.createElement('div');
     container.classList.add('markmap');
-    container.style.position = 'relative'; // createToolbar needs this
-    container.style.width = '100%';
+
+    // Use unified styles
+    applyContainerStyles(container);
+
+    // Specific overrides if needed (e.g. position for toolbar)
+    container.style.position = 'relative';
     container.style.height = 'auto';
     container.style.minHeight = '150px';
-    container.style.border = '1px solid #666';
-    container.style.boxSizing = 'border-box';
-    container.style.borderRadius = '4px';
+    // Border/BoxSizing handled by applyContainerStyles
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.style.width = '100%';
@@ -198,18 +202,8 @@ function renderMarkmaps() {
         await mm.fit();
     };
 
-    const blockEvents = [
-        'click', 'dblclick',
-        'mousedown', 'mouseup', 'mousemove',
-        'wheel',
-        'pointerdown', 'pointerup', 'pointermove',
-        'contextmenu'
-    ];
-    blockEvents.forEach(evt => {
-        container.addEventListener(evt, (e) => {
-            e.stopPropagation();
-        });
-    });
+    // Use Shared Event Blocking
+    preventEventPropagation(container);
 
     (async () => {
         await mm.fit();

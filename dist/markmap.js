@@ -38072,6 +38072,20 @@ ${end2.comment}` : end2.comment;
   ];
 
   // src/utils.js
+  function preventEventPropagation(element) {
+    const events = ["wheel", "mousedown", "mouseup", "mousemove", "click", "dblclick", "pointerdown", "pointerup", "pointermove", "contextmenu"];
+    events.forEach((evt) => {
+      element.addEventListener(evt, (e) => e.stopPropagation());
+    });
+  }
+  function applyContainerStyles(container) {
+    container.style.width = "90%";
+    container.style.margin = "10px auto";
+    container.style.display = "block";
+    container.style.border = "1px solid #666";
+    container.style.borderRadius = "4px";
+    container.style.boxSizing = "border-box";
+  }
   function createToolbar(container) {
     const toolbar = document.createElement("div");
     toolbar.style.position = "absolute";
@@ -38164,13 +38178,10 @@ ${end2.comment}` : end2.comment;
       const { root: root3 } = transformer.transform(markdown);
       const container = document.createElement("div");
       container.classList.add("markmap");
+      applyContainerStyles(container);
       container.style.position = "relative";
-      container.style.width = "100%";
       container.style.height = "auto";
       container.style.minHeight = "150px";
-      container.style.border = "1px solid #666";
-      container.style.boxSizing = "border-box";
-      container.style.borderRadius = "4px";
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.style.width = "100%";
       svg.style.display = "block";
@@ -38251,23 +38262,7 @@ ${end2.comment}` : end2.comment;
         }
         await mm.fit();
       };
-      const blockEvents = [
-        "click",
-        "dblclick",
-        "mousedown",
-        "mouseup",
-        "mousemove",
-        "wheel",
-        "pointerdown",
-        "pointerup",
-        "pointermove",
-        "contextmenu"
-      ];
-      blockEvents.forEach((evt) => {
-        container.addEventListener(evt, (e) => {
-          e.stopPropagation();
-        });
-      });
+      preventEventPropagation(container);
       (async () => {
         await mm.fit();
         await updateLayout();
