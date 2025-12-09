@@ -68,6 +68,7 @@ function processMarkdown(markdown) {
   return newLines.join('\n');
 }
 
+
 /**
  * Markmapをレンダリングする関数
  */
@@ -87,6 +88,7 @@ function renderMarkmaps() {
     const { root } = transformer.transform(markdown);
 
     const container = document.createElement('div');
+    container.classList.add('markmap');
     container.style.position = 'relative';
     container.style.width = '100%';
     container.style.height = 'auto';
@@ -102,24 +104,39 @@ function renderMarkmaps() {
     const style = document.createElement('style');
     style.textContent = `
       .markmap-node {
-        color: #11ff84 !important;
-        fill: #11ff84 !important;
+        cursor: pointer;
+      }
+      .markmap-node circle {
+        fill: var(--markmap-circle-fill, #11ff84);
+        stroke: var(--markmap-circle-stroke, #11ff84);
+        stroke-width: 1px;
       }
       .markmap-node text {
-        fill: #11ff84 !important;
+        fill: var(--markmap-text-color, #fd9bcc);
+        font-family: var(--markmap-font-family, "Fira Code", monospace);
       }
       .markmap-node foreignObject {
-        color: #11ff84 !important;
+        color: var(--markmap-text-color, #fd9bcc);
+        font-family: var(--markmap-font-family, "Fira Code", monospace);
+      }
+      .markmap-node a {
+        color: var(--markmap-link-color, #46d2e8);
+      }
+      .markmap-link {
+        stroke: var(--markmap-line-color, #ff0080);
       }
       .markmap-body-text {
         font-weight: normal;
         font-size: 0.9em;
-        color: #fd9bcc !important;
-        fill: #fd9bcc !important;
+        color: var(--markmap-body-text-color, #fd9bcc);
         display: inline-block;
       }
-      .markmap-node a {
-        color: #8cb4ff !important;
+      /* Highlight/Bold Color Variable mapping */
+      .markmap-node foreignObject strong,
+      .markmap-node foreignObject em,
+      .markmap-node foreignObject b,
+      .markmap-node foreignObject i {
+        color: var(--markmap-highlight-color, #FF14E0) !important;
       }
     `;
     svg.append(style);
@@ -127,10 +144,12 @@ function renderMarkmaps() {
     const toolbar = document.createElement('div');
     toolbar.style.position = 'absolute';
     toolbar.style.right = '20px';
-    toolbar.style.top = '20px';
+    toolbar.style.top = 'auto';
+    toolbar.style.bottom = '20px';
     toolbar.style.padding = '0';
     toolbar.style.display = 'flex';
     toolbar.style.gap = '8px';
+    toolbar.style.flexDirection = 'column';
 
     container.append(svg, toolbar);
     preElement.replaceWith(container);
@@ -161,38 +180,33 @@ function renderMarkmaps() {
         await mm.fit();
     };
 
-    // 更新ボタン (右上に配置)
+    // 更新ボタン (右下に配置)
     const refreshButton = document.createElement('button');
-    refreshButton.textContent = '↻';
+    refreshButton.textContent = '⟲';
     refreshButton.type = 'button';
     refreshButton.title = 'Refresh Layout';
     refreshButton.style.zIndex = '999';
     refreshButton.style.cursor = 'pointer';
     refreshButton.style.width = '30px';
     refreshButton.style.height = '30px';
-    refreshButton.style.borderRadius = '50%'; // 丸くする
-    refreshButton.style.border = '1px solid #ccc';
+    refreshButton.style.borderRadius = '50%';
+    refreshButton.style.border = '1px solid #1f8';
     refreshButton.style.background = '#222';
-    refreshButton.style.color = '#fff';
+    refreshButton.style.color = '#1f8';
     refreshButton.style.fontSize = '16px';
     refreshButton.style.display = 'flex';
     refreshButton.style.alignItems = 'center';
     refreshButton.style.justifyContent = 'center';
-    refreshButton.style.marginBottom = '5px'; // 標準ツールバーとの間隔
+    refreshButton.style.position = 'fixed'; // コンテナに対する相対位置
+    refreshButton.style.bottom = '10px';      // 下端から10px
+    refreshButton.style.right = '10px';       // 右端から10px
 
     refreshButton.onclick = (e) => {
         e.stopPropagation();
         updateLayout();
     };
 
-    // ツールバーを縦並びにする
-    toolbar.style.flexDirection = 'column';
-    // 標準ツールバーの前に更新ボタンを追加して、一番上に表示されるようにする
-    if (toolbar.firstChild) {
-        toolbar.insertBefore(refreshButton, toolbar.firstChild);
-    } else {
-        toolbar.appendChild(refreshButton);
-    }
+    container.appendChild(refreshButton);
 
     const blockEvents = [
         'click', 'dblclick',

@@ -2,7 +2,7 @@ import mermaid from 'mermaid';
 import { select } from 'd3-selection';
 import { zoom, zoomIdentity } from 'd3-zoom';
 
-mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'default' });
+mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'dark' });
 
 const renderMermaid = async () => {
     const blocks = document.querySelectorAll('pre code.language-mermaid');
@@ -17,12 +17,13 @@ const renderMermaid = async () => {
 
         const container = document.createElement('div');
         container.classList.add('mermaid-container');
+        container.classList.add('mermaid'); // Add standard class for user CSS targeting
         container.style.position = 'relative';
         container.style.width = '100%';
         container.style.height = '600px'; // Fixed height for a proper viewport
         container.style.border = '1px solid #ddd';
         container.style.boxSizing = 'border-box';
-        container.style.background = '#fff';
+        container.style.background = 'transparent'; // Allow theme/CSS correctly
         container.style.overflow = 'hidden';
 
         pre.replaceWith(container);
@@ -32,6 +33,32 @@ const renderMermaid = async () => {
             if (await mermaid.parse(raw)) {
                 const { svg } = await mermaid.render(id, raw);
                 container.innerHTML = svg;
+
+                // --- Post-Processing Fixes (Brute Force) ---
+                // Iterate ALL elements to find white backgrounds and kill them
+                const allElements = container.querySelectorAll('*');
+                allElements.forEach(el => {
+                    const style = window.getComputedStyle(el);
+                    const fill = el.getAttribute('fill');
+                    const bgColor = style.backgroundColor;
+
+                    // Check for white fill
+                    if (fill === '#ffffff' || fill === 'white' || fill === 'rgb(255, 255, 255)' || style.fill === 'rgb(255, 255, 255)' || style.fill === '#ffffff') {
+                         el.style.fill = '#000000';
+                         el.setAttribute('fill', '#000000');
+                    }
+
+                    // Check for white background-color (often in foreignObject > div)
+                    if (bgColor === 'rgb(255, 255, 255)' || bgColor === '#ffffff' || bgColor === 'white') {
+                        el.style.backgroundColor = '#000000';
+                    }
+
+                    // Specific fix for edgeLabel rects (in case they are not pure white but 'default' theme color)
+                    if (el.tagName.toLowerCase() === 'rect' && el.closest('.edgeLabel')) {
+                         el.style.fill = '#000000';
+                         el.style.color = '#ff0080'; // Ensure text color is correct if this is a container
+                    }
+                });
 
                 const svgEl = container.querySelector('svg');
                 if (svgEl) {
@@ -115,13 +142,13 @@ const renderMermaid = async () => {
                         btn.style.width = '30px';
                         btn.style.height = '30px';
                         btn.style.borderRadius = '50%';
-                        btn.style.border = '1px solid #ccc';
-                        btn.style.background = '#fff';
+                        btn.style.border = '1px solid #1f8';
+                        btn.style.background = '#222';
                         btn.style.cursor = 'pointer';
                         btn.style.display = 'flex';
                         btn.style.alignItems = 'center';
                         btn.style.justifyContent = 'center';
-                        btn.style.color = '#333';
+                        btn.style.color = '#1f8';
                         btn.onclick = (e) => {
                             e.stopPropagation();
                             onClick();

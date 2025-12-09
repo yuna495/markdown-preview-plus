@@ -38124,9 +38124,18 @@ ${end2.comment}` : end2.comment;
       }
       preElement.dataset.markmapRendered = "true";
       const rawMarkdown = el.textContent;
+      let config3 = {};
+      try {
+        if (el.dataset.markmapConfig) {
+          config3 = JSON.parse(el.dataset.markmapConfig);
+        }
+      } catch (e) {
+        console.error("Failed to parse markmap config", e);
+      }
       const markdown = processMarkdown(rawMarkdown);
       const { root: root3 } = transformer.transform(markdown);
       const container = document.createElement("div");
+      container.classList.add("markmap");
       container.style.position = "relative";
       container.style.width = "100%";
       container.style.height = "auto";
@@ -38134,30 +38143,51 @@ ${end2.comment}` : end2.comment;
       container.style.border = "1px solid #666";
       container.style.boxSizing = "border-box";
       container.style.borderRadius = "4px";
+      if (config3.textColor) container.style.setProperty("--markmap-text-color", config3.textColor);
+      if (config3.headingColor) container.style.setProperty("--markmap-circle-fill", config3.headingColor);
+      if (config3.circleColor) container.style.setProperty("--markmap-circle-stroke", config3.circleColor);
+      if (config3.lineColor) container.style.setProperty("--markmap-line-color", config3.lineColor);
+      if (config3.highlightColor) container.style.setProperty("--markmap-highlight-color", config3.highlightColor);
+      if (config3.linkColor) container.style.setProperty("--markmap-link-color", config3.linkColor);
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.style.width = "100%";
       svg.style.display = "block";
       const style = document.createElement("style");
       style.textContent = `
       .markmap-node {
-        color: #11ff84 !important;
-        fill: #11ff84 !important;
+        cursor: pointer;
+      }
+      .markmap-node circle {
+        fill: var(--markmap-circle-fill, #11ff84);
+        stroke: var(--markmap-circle-stroke, #11ff84);
+        stroke-width: 1px;
       }
       .markmap-node text {
-        fill: #11ff84 !important;
+        fill: var(--markmap-text-color, #fd9bcc);
+        font-family: var(--markmap-font-family, "Fira Code", monospace);
       }
       .markmap-node foreignObject {
-        color: #11ff84 !important;
+        color: var(--markmap-text-color, #fd9bcc);
+        font-family: var(--markmap-font-family, "Fira Code", monospace);
+      }
+      .markmap-node a {
+        color: var(--markmap-link-color, #46d2e8);
+      }
+      .markmap-link {
+        stroke: var(--markmap-line-color, #ff0080);
       }
       .markmap-body-text {
         font-weight: normal;
         font-size: 0.9em;
-        color: #fd9bcc !important;
-        fill: #fd9bcc !important;
+        color: var(--markmap-body-text-color, #fd9bcc);
         display: inline-block;
       }
-      .markmap-node a {
-        color: #8cb4ff !important;
+      /* Highlight/Bold Color Variable mapping */
+      .markmap-node foreignObject strong,
+      .markmap-node foreignObject em,
+      .markmap-node foreignObject b,
+      .markmap-node foreignObject i {
+        color: var(--markmap-highlight-color, #FF14E0) !important;
       }
     `;
       svg.append(style);
@@ -38168,6 +38198,7 @@ ${end2.comment}` : end2.comment;
       toolbar.style.padding = "0";
       toolbar.style.display = "flex";
       toolbar.style.gap = "8px";
+      toolbar.style.flexDirection = "column";
       container.append(svg, toolbar);
       preElement.replaceWith(container);
       const mm = it.create(svg, {
@@ -38199,24 +38230,21 @@ ${end2.comment}` : end2.comment;
       refreshButton.style.width = "30px";
       refreshButton.style.height = "30px";
       refreshButton.style.borderRadius = "50%";
-      refreshButton.style.border = "1px solid #ccc";
+      refreshButton.style.border = "1px solid #1f8";
       refreshButton.style.background = "#222";
-      refreshButton.style.color = "#fff";
+      refreshButton.style.color = "#1f8";
       refreshButton.style.fontSize = "16px";
       refreshButton.style.display = "flex";
       refreshButton.style.alignItems = "center";
       refreshButton.style.justifyContent = "center";
-      refreshButton.style.marginBottom = "5px";
+      refreshButton.style.position = "absolute";
+      refreshButton.style.bottom = "10px";
+      refreshButton.style.right = "10px";
       refreshButton.onclick = (e) => {
         e.stopPropagation();
         updateLayout();
       };
-      toolbar.style.flexDirection = "column";
-      if (toolbar.firstChild) {
-        toolbar.insertBefore(refreshButton, toolbar.firstChild);
-      } else {
-        toolbar.appendChild(refreshButton);
-      }
+      container.appendChild(refreshButton);
       const blockEvents = [
         "click",
         "dblclick",
