@@ -22,8 +22,6 @@
 
 ### リストの例
 
-マークダウンでは、ハイフン (`-`) やアスタリスク (`*`) を使って簡単にリストを作成できます。
-
 - 最初の項目
 - 2番目の項目
   - 入れ子の項目 A
@@ -32,16 +30,16 @@
 
 ### 番号付きリストの例
 
-数字とピリオド (`1.`, `2.`) を使用します。
-
 1. ステップ 1: 準備
 1. ステップ 2: 実行
 1. ステップ 3: [リンク](https://)
-1. ステップ 4: 結果を表示
+1. ステップ 4: リンク先を表示
 
 ```
 
 ## mermaid
+
+- Flowchart
 
 ```mermaid
 graph TD;
@@ -52,6 +50,8 @@ graph TD;
     D --> F[終了];
     E --> F;
 ```
+
+- Sequence
 
 ```mermaid
 sequenceDiagram
@@ -74,6 +74,8 @@ sequenceDiagram
         Server->>Database: 作成実行
     end
 ```
+
+- Crass Diagram
 
 ```mermaid
 classDiagram
@@ -99,6 +101,8 @@ classDiagram
     Manager o-- Employee
 ```
 
+- State Diagram
+
 ```mermaid
 stateDiagram-v2
     [*] --> 待機中
@@ -109,6 +113,8 @@ stateDiagram-v2
     エラー --> 待機中: リトライ
     エラー --> [*]: 中止
 ```
+
+- ER Diagram
 
 ```mermaid
 erDiagram
@@ -140,6 +146,8 @@ erDiagram
     USER ||--o{ COMMENT : makes
 ```
 
+- Gantchart
+
 ```mermaid
 gantt
     title ソフトウェア開発プロジェクト
@@ -159,31 +167,48 @@ gantt
 
 ## graphviz
 
-```graphviz
-digraph G {
-  graph [bgcolor="#000000"];
-  node  [
-    fontsize=18,
-    fontcolor="#ff9bd6",
-    color="#00ff66",
-    penwidth=2,
-  ];
-  edge  [
-    color="#ff14e0",
-    fontcolor="#46d2e8",
-    fontsize=14
-  ];
-
-  1 -> 2 [label="a"];
-  2 -> 3 [label="b"];
-  3 -> 1 [label="c"];
-}
-```
+- Flowchart
 
 ```graphviz
 digraph graph_name {
-  alpha;
-  beta;
-  alpha -> beta;
+  graph [rankdir = LR];
+  node [shape = none];
+
+  1 -> 2 -> 3 -> 4 [
+    arrowhead = none
+  ];
+}
+```
+
+- Record
+
+```graphviz
+digraph graph_name {
+  graph [
+    charset = "UTF-8",
+    bgcolor = "#EDEDED",
+    rankdir = TB,
+    nodesep = 1.1,
+    ranksep = 1.05
+  ];
+
+  node [
+    shape = record,
+    fontname = "Migu 1M",
+    fontsize = 12,
+  ];
+
+  // node define
+  alpha [label = "<pl>left|center|<pr>right"];
+  beta [label = "<pl>left|<pc>center|<pr>right"];
+  gamma [label = "left|center|<pr>right"];
+  delta [label = "{left|{<pc>center|{top|middle|bottom}}|right}}"];
+  epsilon [label = "{top|<pm>middle|bottom}"];
+
+  // edge define
+  alpha:pl -> beta:pl [ label = "a-b", weight = 2.0];
+  alpha:pr -> gamma:pr [label = "a-g", weight = 1.0];
+  beta:pc -> epsilon:pm [label = "b-e"];
+  gamma -> delta:pc [label = "g-d"];
 }
 ```

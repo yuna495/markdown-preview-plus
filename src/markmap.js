@@ -108,11 +108,10 @@ function renderMarkmaps() {
 
     const style = document.createElement('style');
     style.textContent = `
-      .markmap-node foreignObject {
-
-        color: #11ff84 !important;
-        font-family: var(--markmap-font-family) !important;
-        line-height: 1.2;
+      code,
+      pre {
+        color: #fd9bcc !important;
+        background-color: #202020 !important;
       }
       .markmap-node {
         cursor: pointer;
@@ -127,7 +126,7 @@ function renderMarkmaps() {
         font-family: var(--markmap-font-family, "Fira Code", monospace);
       }
       .markmap-node foreignObject {
-        color: var(--markmap-text-color, #fd9bcc);
+        color: var(--markmap-circle-fill, #11ff84);
         font-family: var(--markmap-font-family, "Fira Code", monospace);
       }
       .markmap-node a {

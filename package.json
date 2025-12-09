@@ -21,7 +21,8 @@
       "./dist/graphviz.js"
     ],
     "markdown.previewStyles": [
-      "./dist/markmap-toolbar.css"
+      "./dist/markmap-toolbar.css",
+      "./dist/style.css"
     ],
     "markdown.markdownItPlugins": true
   },
@@ -30,7 +31,7 @@
     "lint": "eslint .",
     "pretest": "npm run lint",
     "test": "vscode-test",
-    "build:style": "copy node_modules\\markmap-toolbar\\dist\\style.css dist\\markmap-toolbar.css",
+    "build:style": "copy node_modules\\markmap-toolbar\\dist\\style.css dist\\markmap-toolbar.css && copy src\\style.css dist\\style.css",
     "build:script": "npx esbuild ./src/markmap.js --bundle --outfile=dist/markmap.js --format=iife --platform=browser",
     "build:mermaid": "npx esbuild ./src/mermaid.js --bundle --outfile=dist/mermaid.js --format=iife --platform=browser",
     "build:graphviz": "npx esbuild ./src/graphviz.js --bundle --outfile=dist/graphviz.js --format=iife --platform=browser",
