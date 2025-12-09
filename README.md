@@ -9,7 +9,7 @@
     - [Mermaid](#mermaid)
     - [Graphviz (DOT)](#graphviz-dot)
   - [🎨 Customization](#-customization)
-    - [Example: Neon Dark Theme (`sample.css`)](#example-neon-dark-theme-samplecss)
+    - [Default Theme: Pink Lily](#default-theme-pink-lily)
   - [License](#license)
 
 ## ✨ Features
@@ -74,19 +74,17 @@ Use standard Markdown code blocks with the appropriate language identifiers: `ma
 
 You can customize the look and feel of your diagrams by creating a `style.css` file in your workspace root or by configuring `markdown.styles` in your VS Code settings.
 
-### Example: Neon Dark Theme (`sample.css`)
+- setting.json
+
+```json
+"markdown.styles": ["./style.css"]
+```
+
+### Default Theme: Pink Lily
 
 Below is a comprehensive style sheet that creates a high-contrast Neon/Cyberpunk look for your preview and diagrams.
 
 ```css
-/*//////////////////////////////////////////////*/
-/* mermaid and other diagrams */
-/*//////////////////////////////////////////////*/
-
-/*
-  Theme Variables Override (Mermaid v10+)
-  Mermaid uses CSS variables for theming.
-*/
 :root {
   /* Colors - User Requirements */
   --mermaid-primary-color: #272b2b;       /* Dark Background for nodes */
@@ -111,7 +109,6 @@ Below is a comprehensive style sheet that creates a high-contrast Neon/Cyberpunk
   --markmap-line-width: 4px;
   --markmap-font-family: "Fira Code", "Shippori Mincho", monospace;
 }
-
 
 /*
   ========================================
@@ -138,10 +135,10 @@ Below is a comprehensive style sheet that creates a high-contrast Neon/Cyberpunk
 .mermaid .nodeLabel,
 .mermaid .label {
   color: var(--mermaid-text-color) !important;
-  fill: var(--mermaid-text-color) !important;
+  fill: var(--mermaid-text-color) !important; /* SVG text uses fill */
   font-family: var(--mermaid-font-family);
 }
-/* Handle foreignObject text */
+/* Handle foreignObject text (Common in flowcharts) */
 .mermaid .node .label foreignObject div,
 .mermaid .nodeLabel foreignObject div,
 .mermaid .label foreignObject div,
@@ -163,19 +160,21 @@ Below is a comprehensive style sheet that creates a high-contrast Neon/Cyberpunk
   fill: var(--mermaid-arrow-color) !important;
   stroke: var(--mermaid-arrow-color) !important;
 }
+/* V10 often puts markers in defs, coloring the path is key, but marker-end needs color too */
 .mermaid marker path {
   fill: var(--mermaid-arrow-color) !important;
   stroke: var(--mermaid-arrow-color) !important;
 }
 
-/* Edge Labels */
+/* Edge Labels (Text on lines) */
 .mermaid .edgeLabel,
 .mermaid .edgeLabel rect {
-  background-color: #000000 !important;
+  background-color: #000000 !important; /* Dark background for readability */
   fill: #000000 !important;
 }
 
 /* Sequence Diagram Adjustments */
+/* Actors */
 .mermaid g.actor,
 .mermaid rect.actor {
   fill: var(--mermaid-primary-color) !important;
@@ -185,13 +184,19 @@ Below is a comprehensive style sheet that creates a high-contrast Neon/Cyberpunk
 .mermaid tspan {
   fill: var(--mermaid-text-color) !important;
 }
+
+/* Lines */
 .mermaid line {
   stroke: var(--mermaid-line-color) !important;
 }
+
+/* Message Text */
 .mermaid .messageText {
   fill: var(--mermaid-text-color) !important;
   stroke: none !important;
 }
+
+/* Notes */
 .mermaid .note {
   fill: #222 !important;
   stroke: var(--mermaid-border-color) !important;
@@ -199,6 +204,8 @@ Below is a comprehensive style sheet that creates a high-contrast Neon/Cyberpunk
 .mermaid .noteText {
   fill: #fff !important;
 }
+
+/* Loops / Alt blocks */
 .mermaid .loopText,
 .mermaid .loopText > tspan {
   fill: #fff !important;
@@ -207,45 +214,135 @@ Below is a comprehensive style sheet that creates a high-contrast Neon/Cyberpunk
   stroke: var(--mermaid-border-color) !important;
 }
 
-/* Markmap Styling */
+/*
+  ========================================
+  Class Diagram
+  ========================================
+*/
+
+.mermaid g.classGroup rect {
+  fill: var(--mermaid-primary-color) !important;
+  stroke: var(--mermaid-border-color) !important;
+  stroke-width: 2px;
+}
+
+.mermaid g.classGroup text {
+  fill: var(--mermaid-text-color) !important;
+}
+
+.mermaid g.classGroup line {
+  stroke: var(--mermaid-border-color) !important;
+}
+
+.mermaid .relation {
+  stroke: var(--mermaid-line-color) !important;
+  stroke-width: 2px;
+  fill: none;
+}
+
+/*
+  ========================================
+  State Diagram
+  ========================================
+*/
+.mermaid .stateGroup rect,
+.mermaid .stateGroup circle {
+  fill: var(--mermaid-primary-color) !important;
+  stroke: var(--mermaid-border-color) !important;
+}
+.mermaid .stateGroup text {
+  fill: var(--mermaid-text-color) !important;
+}
+/* State Diagram v2 Edges */
+.mermaid .transition {
+  stroke: var(--mermaid-line-color) !important;
+}
+
+/*
+  ========================================
+  ER Diagram
+  ========================================
+*/
+/*
+   We target all rects in entity boxes to ensure background is applied.
+   We specify colors for alternating rows if needed, or default to general.
+*/
+.mermaid .entityBox {
+  fill: var(--mermaid-primary-color) !important;
+  stroke: var(--mermaid-border-color) !important;
+}
+.mermaid .entityBox rect,
+.mermaid .er-entityBox rect {
+  fill: var(--mermaid-primary-color) !important;
+  stroke: var(--mermaid-border-color) !important;
+}
+
+/* ER Diagram Edges */
+.mermaid .relationshipLine {
+  stroke: var(--mermaid-line-color) !important;
+}
+.mermaid path.er.relationshipLine {
+  stroke: var(--mermaid-line-color) !important;
+}
+
+/*//////////////////////////////////////////////*/
+/* Markmap (Mindmap) */
+/*//////////////////////////////////////////////*/
+
+/* Node lines and circles */
 .markmap-node {
   color: var(--markmap-text-color) !important;
   fill: var(--markmap-circle-fill) !important;
 }
+
+/* Lines (Edges) */
 .markmap-link,
 .markmap svg > g > path {
   stroke-opacity: 1 !important;
   fill: none !important;
 }
+
+/* Text elements (SVG text) */
 .markmap-node text {
   fill: var(--markmap-text-color) !important;
 }
+
+/* ForeignObject (Rich text container) */
 .markmap-node foreignObject {
   color: var(--markmap-circle-fill) !important;
   font-family: var(--markmap-font-family) !important;
   line-height: 1.2;
 }
+
+/* Body Text (Custom span) -> Override to Pink */
 .markmap-node foreignObject .markmap-body-text {
   font-weight: normal;
   font-size: 0.9em;
   color: var(--markmap-body-text-color) !important;
   display: inline-block;
 }
+
+/* Bold/Strong/Em -> Dark Pink */
 .markmap-node foreignObject strong,
 .markmap-node foreignObject em,
 .markmap-node foreignObject b,
 .markmap-node foreignObject i {
   color: #FF14E0 !important;
 }
+
+/* Links inside nodes */
 .markmap-node a {
   color: var(--markmap-link-color) !important;
 }
 
-/* Code Fences */
-code,
-pre {
-  color: #fd9bcc !important;
-  background-color: #202020 !important;
+/* Update Animation */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.markmap-spin {
+  animation: spin 0.8s linear infinite;
 }
 ```
 

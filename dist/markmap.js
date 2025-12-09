@@ -38185,60 +38185,6 @@ ${end2.comment}` : end2.comment;
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.style.width = "100%";
       svg.style.display = "block";
-      const style = document.createElement("style");
-      style.textContent = `
-      code,
-      pre {
-        color: #fd9bcc !important;
-        background-color: #202020 !important;
-      }
-      .markmap-node {
-        cursor: pointer;
-      }
-      .markmap-node circle {
-        fill: var(--markmap-circle-fill, #11ff84);
-        stroke: var(--markmap-circle-stroke, #11ff84);
-        stroke-width: 1px;
-      }
-      .markmap-node text {
-        fill: var(--markmap-text-color, #fd9bcc);
-        font-family: var(--markmap-font-family, "Fira Code", monospace);
-      }
-      .markmap-node foreignObject {
-        color: var(--markmap-circle-fill, #11ff84);
-        font-family: var(--markmap-font-family, "Fira Code", monospace);
-      }
-      .markmap-node a {
-        color: var(--markmap-link-color, #46d2e8);
-      }
-      .markmap-link {
-        /* stroke: var(--markmap-line-color, #ff0080); */
-      }
-      .markmap-body-text {
-        font-weight: normal;
-        font-size: 0.9em;
-        color: var(--markmap-body-text-color, #fd9bcc);
-        display: inline-block;
-      }
-      /* Highlight/Bold Color Variable mapping */
-      .markmap-node foreignObject strong,
-      .markmap-node foreignObject em,
-      .markmap-node foreignObject b,
-      .markmap-node foreignObject i {
-        color: var(--markmap-highlight-color, #FF14E0) !important;
-      }
-      /* \u66F4\u65B0\u30A2\u30CB\u30E1\u30FC\u30B7\u30E7\u30F3\u306E\u5B9A\u7FA9 */
-      @keyframes spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-      }
-
-      /* \u30A2\u30CB\u30E1\u30FC\u30B7\u30E7\u30F3\u3092\u9069\u7528\u3059\u308B\u30AF\u30E9\u30B9 */
-      .markmap-spin {
-        animation: spin 0.8s linear infinite;
-      }
-    `;
-      svg.append(style);
       container.append(svg);
       preElement.replaceWith(container);
       const mm = it.create(svg, {
