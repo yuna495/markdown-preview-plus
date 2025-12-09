@@ -38070,7 +38070,43 @@ ${end2.comment}` : end2.comment;
     "recurse",
     "dark"
   ];
-  var Toolbar = _Toolbar;
+
+  // src/utils.js
+  function createToolbar(container) {
+    const toolbar = document.createElement("div");
+    toolbar.style.position = "absolute";
+    toolbar.style.right = "10px";
+    toolbar.style.bottom = "10px";
+    toolbar.style.display = "flex";
+    toolbar.style.flexDirection = "column";
+    toolbar.style.gap = "5px";
+    toolbar.style.zIndex = "1000";
+    if (getComputedStyle(container).position === "static") {
+      container.style.position = "relative";
+    }
+    container.appendChild(toolbar);
+    return toolbar;
+  }
+  function createToolbarButton(text3, onClick, title = "") {
+    const btn = document.createElement("button");
+    btn.textContent = text3;
+    if (title) btn.title = title;
+    btn.style.width = "30px";
+    btn.style.height = "30px";
+    btn.style.borderRadius = "50%";
+    btn.style.border = "1px solid #1f8";
+    btn.style.background = "#222";
+    btn.style.cursor = "pointer";
+    btn.style.display = "flex";
+    btn.style.alignItems = "center";
+    btn.style.justifyContent = "center";
+    btn.style.color = "#1f8";
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      onClick(e);
+    };
+    return btn;
+  }
 
   // src/markmap.js
   var transformer = new Transformer();
@@ -38187,25 +38223,21 @@ ${end2.comment}` : end2.comment;
       }
     `;
       svg.append(style);
-      const toolbar = document.createElement("div");
-      toolbar.style.position = "absolute";
-      toolbar.style.right = "20px";
-      toolbar.style.top = "auto";
-      toolbar.style.bottom = "20px";
-      toolbar.style.padding = "0";
-      toolbar.style.display = "flex";
-      toolbar.style.gap = "8px";
-      toolbar.style.flexDirection = "column";
-      container.append(svg, toolbar);
+      container.append(svg);
       preElement.replaceWith(container);
       const mm = it.create(svg, {
         spacingVertical: 15,
         paddingX: 20,
         maxWidth: 300
       }, root3);
-      Toolbar.create(mm, toolbar);
-      const updateLayout = async () => {
+      const toolbar = createToolbar(container);
+      const refreshButton = createToolbarButton("\u27F2", async () => {
         refreshButton.classList.add("markmap-spin");
+        await updateLayout();
+        refreshButton.classList.remove("markmap-spin");
+      }, "Refresh Layout");
+      toolbar.appendChild(refreshButton);
+      const updateLayout = async () => {
         await mm.fit();
         const { y2 } = mm.state.rect;
         let calculatedHeight = y2 * 1.5 + 300;
@@ -38218,32 +38250,7 @@ ${end2.comment}` : end2.comment;
           container.style.height = `${calculatedHeight}px`;
         }
         await mm.fit();
-        refreshButton.classList.remove("markmap-spin");
       };
-      const refreshButton = document.createElement("button");
-      refreshButton.textContent = "\u27F2";
-      refreshButton.type = "button";
-      refreshButton.title = "Refresh Layout";
-      refreshButton.style.zIndex = "999";
-      refreshButton.style.cursor = "pointer";
-      refreshButton.style.width = "30px";
-      refreshButton.style.height = "30px";
-      refreshButton.style.borderRadius = "50%";
-      refreshButton.style.border = "1px solid #1f8";
-      refreshButton.style.background = "#222";
-      refreshButton.style.color = "#1f8";
-      refreshButton.style.fontSize = "16px";
-      refreshButton.style.display = "flex";
-      refreshButton.style.alignItems = "center";
-      refreshButton.style.justifyContent = "center";
-      refreshButton.style.position = "fixed";
-      refreshButton.style.bottom = "10px";
-      refreshButton.style.right = "10px";
-      refreshButton.onclick = (e) => {
-        e.stopPropagation();
-        updateLayout();
-      };
-      container.appendChild(refreshButton);
       const blockEvents = [
         "click",
         "dblclick",

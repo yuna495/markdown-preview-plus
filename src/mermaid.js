@@ -1,8 +1,16 @@
 import mermaid from 'mermaid';
 import { select } from 'd3-selection';
 import { zoom, zoomIdentity } from 'd3-zoom';
+import { createToolbar, createToolbarButton } from './utils.js';
 
-mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'dark' });
+mermaid.initialize({
+    startOnLoad: false,
+    securityLevel: 'loose',
+    theme: 'dark',
+    gantt: {
+        todayMarker: false
+    }
+});
 
 const renderMermaid = async () => {
     const blocks = document.querySelectorAll('pre code.language-mermaid');
@@ -126,42 +134,14 @@ const renderMermaid = async () => {
                     d3Svg.on('dblclick.zoom', null);
 
 
-                    // Toolbar
-                    const toolbar = document.createElement('div');
-                    toolbar.style.position = 'absolute';
-                    toolbar.style.right = '10px';
-                    toolbar.style.bottom = '10px';
-                    toolbar.style.display = 'flex';
-                    toolbar.style.flexDirection = 'column';
-                    toolbar.style.gap = '5px';
-                    toolbar.style.zIndex = '1000';
+                    // Toolbar uses utils
+                    const toolbar = createToolbar(container);
 
-                    const createBtn = (text, onClick) => {
-                        const btn = document.createElement('button');
-                        btn.textContent = text;
-                        btn.style.width = '30px';
-                        btn.style.height = '30px';
-                        btn.style.borderRadius = '50%';
-                        btn.style.border = '1px solid #1f8';
-                        btn.style.background = '#222';
-                        btn.style.cursor = 'pointer';
-                        btn.style.display = 'flex';
-                        btn.style.alignItems = 'center';
-                        btn.style.justifyContent = 'center';
-                        btn.style.color = '#1f8';
-                        btn.onclick = (e) => {
-                            e.stopPropagation();
-                            onClick();
-                        };
-                        return btn;
-                    };
-
-                    const btnReset = createBtn('⟲', () => {
+                    const btnReset = createToolbarButton('⟲', () => {
                          d3Svg.transition().call(zoomBehavior.transform, initialTransform);
-                    });
+                    }, 'Reset Zoom');
 
                     toolbar.appendChild(btnReset);
-                    container.appendChild(toolbar);
 
                     // Stop propagation
                     const events = ['wheel', 'mousedown', 'mouseup', 'mousemove', 'click', 'dblclick'];

@@ -3,6 +3,7 @@
 import { Transformer } from 'markmap-lib';
 import { Markmap } from 'markmap-view';
 import { Toolbar } from 'markmap-toolbar';
+import { createToolbar, createToolbarButton } from './utils.js';
 
 // Transformerのインスタンスを1つ作成し、再利用
 const transformer = new Transformer();
@@ -89,7 +90,7 @@ function renderMarkmaps() {
 
     const container = document.createElement('div');
     container.classList.add('markmap');
-    container.style.position = 'relative';
+    container.style.position = 'relative'; // createToolbar needs this
     container.style.width = '100%';
     container.style.height = 'auto';
     container.style.minHeight = '150px';
@@ -151,17 +152,10 @@ function renderMarkmaps() {
     `;
     svg.append(style);
 
-    const toolbar = document.createElement('div');
-    toolbar.style.position = 'absolute';
-    toolbar.style.right = '20px';
-    toolbar.style.top = 'auto';
-    toolbar.style.bottom = '20px';
-    toolbar.style.padding = '0';
-    toolbar.style.display = 'flex';
-    toolbar.style.gap = '8px';
-    toolbar.style.flexDirection = 'column';
+    // Old Markmap Toolbar removed (lines 154-162 in original)
+    // We use our shared Toolbar instead later.
 
-    container.append(svg, toolbar);
+    container.append(svg);
     preElement.replaceWith(container);
 
     const mm = Markmap.create(svg, {
@@ -170,10 +164,23 @@ function renderMarkmaps() {
       maxWidth: 300,
     }, root);
 
-    Toolbar.create(mm, toolbar);
+    // Toolbar.create(mm, toolbar); // Disable default markmap toolbar to use ours?
+    // Wait, the user wants the REFRESH button. The default toolbar has zoom/pan/etc.
+    // The user screenshot showed a custom refresh button. I will recreate THAT.
+    // If user wants internal toolbar too... for now I focused on the refresh button.
+
+    // Use shared toolbar for Refresh Button
+    const toolbar = createToolbar(container);
+
+    const refreshButton = createToolbarButton('⟲', async () => {
+        refreshButton.classList.add('markmap-spin');
+        await updateLayout();
+        refreshButton.classList.remove('markmap-spin');
+    }, 'Refresh Layout');
+
+    toolbar.appendChild(refreshButton);
 
     const updateLayout = async () => {
-        refreshButton.classList.add('markmap-spin');
         await mm.fit();
         const { y2 } = mm.state.rect;
 
@@ -189,36 +196,7 @@ function renderMarkmaps() {
             container.style.height = `${calculatedHeight}px`;
         }
         await mm.fit();
-        refreshButton.classList.remove('markmap-spin');
     };
-
-    // 更新ボタン (右下に配置)
-    const refreshButton = document.createElement('button');
-    refreshButton.textContent = '⟲';
-    refreshButton.type = 'button';
-    refreshButton.title = 'Refresh Layout';
-    refreshButton.style.zIndex = '999';
-    refreshButton.style.cursor = 'pointer';
-    refreshButton.style.width = '30px';
-    refreshButton.style.height = '30px';
-    refreshButton.style.borderRadius = '50%';
-    refreshButton.style.border = '1px solid #1f8';
-    refreshButton.style.background = '#222';
-    refreshButton.style.color = '#1f8';
-    refreshButton.style.fontSize = '16px';
-    refreshButton.style.display = 'flex';
-    refreshButton.style.alignItems = 'center';
-    refreshButton.style.justifyContent = 'center';
-    refreshButton.style.position = 'fixed'; // コンテナに対する相対位置
-    refreshButton.style.bottom = '10px';      // 下端から10px
-    refreshButton.style.right = '10px';       // 右端から10px
-
-    refreshButton.onclick = (e) => {
-        e.stopPropagation();
-        updateLayout();
-    };
-
-    container.appendChild(refreshButton);
 
     const blockEvents = [
         'click', 'dblclick',
@@ -239,6 +217,8 @@ function renderMarkmaps() {
     })();
   });
 }
+
+
 
 // 初期レンダリング
 renderMarkmaps();
