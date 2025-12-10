@@ -1,17 +1,9 @@
 import mermaid from 'mermaid';
 import { select } from 'd3-selection';
 import { createToolbar, createToolbarButton, applyContainerStyles, setupD3Zoom, preventEventPropagation } from './utils.js';
+import { getPinkLilyVariables } from './theme-pinklily.js';
 
-mermaid.initialize({
-  startOnLoad: false,
-  securityLevel: 'loose',
-  theme: 'base',
-  gantt: {
-    todayMarker: false
-  }
-});
-
-const renderMermaid = async () => {
+const initMermaid = () => {
   // Helper to extract theme from class list
   const extractTheme = (element) => {
       if (!element) return null;
@@ -33,6 +25,34 @@ const renderMermaid = async () => {
       console.log('[MPP Render] No global config found. Defaulting to pinklily.');
   }
 
+  // 2. Prepare Config Override
+  const isPinkLily = (globalTheme === 'pinklily');
+  const internalTheme = isPinkLily ? 'base' : globalTheme;
+
+  let themeVariables = {};
+  if (isPinkLily) {
+        themeVariables = getPinkLilyVariables();
+  }
+
+  // Initialize Mermaid Globally
+  mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: 'loose',
+      theme: internalTheme,
+      gantt: {
+        todayMarker: false
+      },
+      themeVariables: themeVariables
+  });
+
+  return { globalTheme, isPinkLily };
+};
+
+// Initial run
+const { globalTheme, isPinkLily } = initMermaid();
+
+
+const renderMermaid = async () => {
   const wrappers = document.querySelectorAll('.mpp-mermaid-wrapper');
   const nakedBlocks = document.querySelectorAll('pre code.language-mermaid');
 
@@ -41,11 +61,11 @@ const renderMermaid = async () => {
      if (wrapper.dataset.mermaidRendered) continue;
      wrapper.dataset.mermaidRendered = 'true';
 
-     const theme = extractTheme(wrapper) || globalTheme;
+     const elementTheme = extractThemeFromElement(wrapper) || globalTheme;
      const block = wrapper.querySelector('code');
      if (!block) continue;
 
-     await processBlock(block, theme, wrapper);
+     await processBlock(block, elementTheme, wrapper);
   }
 
   // Process naked blocks (Fallback)
@@ -60,19 +80,22 @@ const renderMermaid = async () => {
   }
 };
 
+function extractThemeFromElement(element) {
+    if (!element) return null;
+    for (const cls of element.classList) {
+        if (cls.startsWith('theme-')) {
+            return cls.replace('theme-', '');
+        }
+    }
+    return null;
+}
+
 async function processBlock(block, themeStr, replaceTarget) {
     const id = `mermaid-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     let raw = block.textContent.trim();
 
-    // Construct Directive based on themeStr
-    const isPinkLily = (themeStr === 'pinklily');
-    const internalTheme = isPinkLily ? 'base' : themeStr;
-    const directive = `%%{init: { "theme": "${internalTheme}", "gantt": { "todayMarker": false } } }%%\n`;
-
-    if (!raw.includes('%%{init:')) {
-        raw = directive + raw;
-        // console.log(`[MPP Render] Injected directive for theme: ${themeStr}`);
-    }
+    // NOTE: We do NOT inject directives here anymore.
+    // We rely on the global initialize() call above.
 
     console.log('[MPP Render] Processing block:', id);
 
@@ -80,7 +103,8 @@ async function processBlock(block, themeStr, replaceTarget) {
     container.classList.add('mermaid-container');
     container.classList.add('mermaid');
 
-    if (isPinkLily) {
+    // Add Scoped Class just in case styling is needed
+    if (themeStr === 'pinklily') {
         container.classList.add('mpp-theme-pinklily');
     }
 
