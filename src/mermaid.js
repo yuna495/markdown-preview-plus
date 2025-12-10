@@ -6,44 +6,47 @@ import { getPinkLilyVariables } from './theme-pinklily.js';
 const initMermaid = () => {
   // Helper to extract theme from class list
   const extractTheme = (element) => {
-      if (!element) return null;
-      for (const cls of element.classList) {
-          if (cls.startsWith('theme-')) {
-              return cls.replace('theme-', '');
-          }
+    if (!element) return null;
+    for (const cls of element.classList) {
+      if (cls.startsWith('theme-')) {
+        return cls.replace('theme-', '');
       }
-      return null;
-  };
+    }
+    return null;
+};
 
   // 1. Get Global Config (Class-based)
   const configDiv = document.getElementById('mpp-config');
   const globalTheme = extractTheme(configDiv) || 'pinklily';
 
   if (configDiv) {
-      console.log(`[MPP Render] Found global config (class-based). Theme: ${globalTheme}`);
+    console.log(`[MPP Render] Found global config (class-based). Theme: ${globalTheme}`);
   } else {
-      console.log('[MPP Render] No global config found. Defaulting to pinklily.');
+    console.log('[MPP Render] No global config found. Defaulting to pinklily.');
   }
 
-  // 2. Prepare Config Override
+  // 2. Prepare Config Object
   const isPinkLily = (globalTheme === 'pinklily');
-  const internalTheme = isPinkLily ? 'base' : globalTheme;
 
-  let themeVariables = {};
+  // 基本設定
+  let config = {
+    startOnLoad: false,
+    securityLevel: 'loose',
+    gantt: {
+        todayMarker: false
+    },
+    theme: isPinkLily ? 'base' : globalTheme,
+    themeVariables: {} // 初期値は空
+  };
+
+  // PinkLilyの場合のみ詳細設定を注入
   if (isPinkLily) {
-        themeVariables = getPinkLilyVariables();
+      const pinkVariables = getPinkLilyVariables();
+      config.themeVariables = pinkVariables;
   }
 
   // Initialize Mermaid Globally
-  mermaid.initialize({
-      startOnLoad: false,
-      securityLevel: 'loose',
-      theme: internalTheme,
-      gantt: {
-        todayMarker: false
-      },
-      themeVariables: themeVariables
-  });
+  mermaid.initialize(config);
 
   return { globalTheme, isPinkLily };
 };
@@ -58,14 +61,14 @@ const renderMermaid = async () => {
 
   // Process wrappers
   for (const wrapper of wrappers) {
-     if (wrapper.dataset.mermaidRendered) continue;
-     wrapper.dataset.mermaidRendered = 'true';
+    if (wrapper.dataset.mermaidRendered) continue;
+    wrapper.dataset.mermaidRendered = 'true';
 
-     const elementTheme = extractThemeFromElement(wrapper) || globalTheme;
-     const block = wrapper.querySelector('code');
-     if (!block) continue;
+    const elementTheme = extractThemeFromElement(wrapper) || globalTheme;
+    const block = wrapper.querySelector('code');
+    if (!block) continue;
 
-     await processBlock(block, elementTheme, wrapper);
+    await processBlock(block, elementTheme, wrapper);
   }
 
   // Process naked blocks (Fallback)

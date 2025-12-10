@@ -18,13 +18,46 @@
 
 /* Global Generic Styles (Scoped to container or wrapper) */
 /*
-   Mermaid diagrams are replaced with div.mermaid-container.
-   Original code blocks are pre code.
-   We target the class on the container.
+  Mermaid diagrams are replaced with div.mermaid-container.
+  Original code blocks are pre code.
+  We target the class on the container.
+*/
+/* Global Generic Styles (Scoped to container or wrapper) */
+/*
+  Mermaid diagrams are replaced with div.mermaid-container.
+  Original code blocks are pre code.
+  We target the class on the container.
 */
 .mpp-theme-pinklily code,
 .mpp-theme-pinklily pre,
 .mpp-theme-pinklily {
   color: #fd9bcc !important;
-  background-color: #202020 !important;
+  background-color: #00000000 !important;
+}
+
+/* Subgraph/Cluster Background Override (Force Gray) */
+.mpp-theme-pinklily g.cluster rect,
+.mpp-theme-pinklily .cluster rect {
+  fill: #202020 !important;
+  stroke: #11ff84 !important; /* Keep border consistent */
+}
+
+/* 奇数行 (Odd) */
+.mpp-theme-pinklily.mermaid g.row-rect-odd path[stroke="none"] {
+    fill: var(--mermaid-secondary-color) !important;
+    opacity: 1 !important; /* 念のため透過防止 */
+}
+
+/* 偶数行 (Even) - ある場合 */
+.mpp-theme-pinklily.mermaid g.row-rect-even path[stroke="none"] {
+    fill: var(--mermaid-primary-color) !important;
+    opacity: 1 !important;
+}
+
+/* 念のための保険: fill属性が直接 white/hsl 指定されている場合への強力な上書き */
+.mpp-theme-pinklily.mermaid .row-rect-odd path:first-child {
+    fill: var(--mermaid-secondary-color) !important;
+}
+.mpp-theme-pinklily.mermaid .row-rect-even path:first-child {
+    fill: var(--mermaid-primary-color) !important;
 }

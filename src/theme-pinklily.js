@@ -20,6 +20,7 @@ export const getPinkLilyVariables = () => {
         // Base Variables
         "background": primary,
         "mainBkg": primary,
+        "fill": secondary,
         "primaryColor": primary,
         "secondaryColor": secondary,
         "tertiaryColor": tertiary,
@@ -42,11 +43,11 @@ export const getPinkLilyVariables = () => {
         "nodeBkg": primary,
         "nodeBorder": green,
         "nodeTextColor": pinkText,
-        "clusterBkg": grayBkg,
+        "clusterBkg": secondary, // Subgraph Background
         "clusterBorder": green,
         "defaultLinkColor": pinkLine,
         "titleColor": pinkText,
-        "edgeLabelBackground": black,
+        "edgeLabelBackground": primary,
 
         // Sequence Diagram
         "actorBorder": green,
@@ -90,7 +91,7 @@ export const getPinkLilyVariables = () => {
         "doneTaskBorderColor": grayBorder,
         "doneTaskTextColor": cyanText,
 
-        "critBorderColor": "#ffcccc",
+        "critBorderColor": "#ff8080",
         "critBkgColor": red,
         "critTextColor": white,
 
@@ -115,31 +116,31 @@ export const getPinkLilyVariables = () => {
         "compositeTitleBackground": secondary,
         "compositeBorder": green,
         "innerEndBackground": primary,
-        "specialStateColor": purple, // Vibrant purple for special states (start/end)
+        "specialStateColor": purple,
 
         // Class Diagram
         "classText": pinkText,
 
-        // Pie Chart (Uses new vibrant palette)
-        "pie1": primary,    // Dark base
-        "pie2": purple,     // Purple
-        "pie3": blue,       // Blue/Turquoise
-        "pie4": pinkLine,   // Pink
-        "pie5": yellow,     // Yellow
-        "pie6": orange,     // Orange
-        "pie7": green,      // Green
-        "pie8": secondary,  // Dark Gray
-        "pie9": tertiary,   // Light Gray
-        "pie10": cyanText,  // Cyan
-        "pie11": red,       // Red
-        "pie12": white,     // White
+        // Pie Chart (Vibrant Palette)
+        "pie1": pinkLine + "80",   // Pink (Standard)
+        "pie2": purple + "80",     // Purple
+        "pie3": blue + "80",       // Blue
+        "pie4": orange + "80",     // Orange
+        "pie5": yellow + "80",     // Yellow
+        "pie6": green + "80",      // Green
+        "pie7": cyanText + "80",   // Cyan
+        "pie8": red + "80",        // Red
+        "pie9": white,      // White (Contrast)
+        "pie10": primary,   // Dark (Fallback)
+        "pie11": secondary,
+        "pie12": tertiary,
         "pieTitleTextColor": pinkText,
         "pieLegendTextColor": pinkText,
         "pieStrokeColor": green,
         "pieStrokeWidth": "2px",
         "pieOuterStrokeWidth": "2px",
         "pieOuterStrokeColor": green,
-        "pieOpacity": "0.8",
+        "pieOpacity": "1.0",
 
         // Quadrant Chart
         "quadrant1Fill": tertiary,
@@ -167,7 +168,7 @@ export const getPinkLilyVariables = () => {
         "relationLabelBackground": tertiary,
         "relationLabelColor": pinkText,
 
-        // Git Graph (Uses new vibrant palette)
+        // Git Graph
         "git0": pinkLine,
         "git1": green,
         "git2": cyanText,
@@ -186,14 +187,14 @@ export const getPinkLilyVariables = () => {
         "gitInv6": blue,
         "gitInv7": red,
 
-        "gitBranchLabel0": white,
-        "gitBranchLabel1": white,
-        "gitBranchLabel2": white,
-        "gitBranchLabel3": white,
-        "gitBranchLabel4": black, // Yellow needs dark text
-        "gitBranchLabel5": black, // Orange needs dark text
-        "gitBranchLabel6": black, // Blue needs dark text? No, blue is #00e6bb -> dark is better
-        "gitBranchLabel7": white,
+        "gitBranchLabel0": black,
+        "gitBranchLabel1": black,
+        "gitBranchLabel2": black,
+        "gitBranchLabel3": black,
+        "gitBranchLabel4": black,
+        "gitBranchLabel5": black,
+        "gitBranchLabel6": black,
+        "gitBranchLabel7": black,
 
         "tagLabelColor": cyanText,
         "tagLabelBackground": primary,
@@ -205,7 +206,7 @@ export const getPinkLilyVariables = () => {
 
         // Other / Generic
         "hoverChanged": green,
-        "attributeBackgroundColorOdd": tertiary,
+        "attributeBackgroundColorOdd": primary,
         "attributeBackgroundColorEven": secondary
     };
 };
